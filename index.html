@@ -347,6 +347,224 @@
         .reset-hint.visible {
             opacity: 1;
         }
+
+        /* Cat */
+        .cat {
+            position: absolute;
+            right: -90px;
+            bottom: -10px;
+            width: 80px;
+            height: 100px;
+            transition: transform 0.3s ease;
+        }
+
+        .cat.excited {
+            animation: catBounce 0.4s ease infinite alternate;
+        }
+
+        @keyframes catBounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-6px); }
+        }
+
+        .cat-body {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 45px;
+            background: #555;
+            border-radius: 50% 50% 45% 45%;
+        }
+
+        .cat-head {
+            position: absolute;
+            bottom: 38px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 46px;
+            height: 40px;
+            background: #555;
+            border-radius: 50% 50% 46% 46%;
+            z-index: 2;
+        }
+
+        /* Ears */
+        .cat-ear {
+            position: absolute;
+            top: -10px;
+            width: 0;
+            height: 0;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 16px solid #555;
+        }
+
+        .cat-ear.left { left: 3px; transform: rotate(-8deg); }
+        .cat-ear.right { right: 3px; transform: rotate(8deg); }
+
+        .cat-ear-inner {
+            position: absolute;
+            top: -7px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 10px solid #ffa0b4;
+        }
+
+        .cat-ear.left .cat-ear-inner { left: -5px; }
+        .cat-ear.right .cat-ear-inner { right: -5px; left: auto; }
+
+        /* Eyes */
+        .cat-eyes {
+            position: absolute;
+            top: 13px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .cat-eye {
+            width: 8px;
+            height: 8px;
+            background: #2a2a2a;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .cat-eye::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cat.excited .cat-eye {
+            height: 10px;
+            width: 10px;
+        }
+
+        /* Nose */
+        .cat-nose {
+            position: absolute;
+            top: 23px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 4px;
+            background: #ffa0b4;
+            border-radius: 50%;
+        }
+
+        /* Mouth - normal */
+        .cat-mouth {
+            position: absolute;
+            top: 27px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 5px;
+            display: flex;
+            gap: 0;
+        }
+
+        .cat-mouth::before,
+        .cat-mouth::after {
+            content: '';
+            width: 6px;
+            height: 5px;
+            border-bottom: 2px solid #333;
+        }
+
+        .cat-mouth::before {
+            border-radius: 0 0 0 50%;
+            border-left: 2px solid #333;
+        }
+
+        .cat-mouth::after {
+            border-radius: 0 0 50% 0;
+            border-right: 2px solid #333;
+        }
+
+        /* Tongue - hidden by default */
+        .cat-tongue {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 0;
+            background: #ff7090;
+            border-radius: 0 0 50% 50%;
+            transition: height 0.15s ease;
+            z-index: 1;
+        }
+
+        .cat.licking .cat-tongue {
+            animation: lick 0.6s ease-in-out infinite;
+        }
+
+        @keyframes lick {
+            0%   { height: 0; transform: translateX(-50%) rotate(0deg); }
+            15%  { height: 10px; transform: translateX(-50%) rotate(-10deg); }
+            35%  { height: 12px; transform: translateX(-50%) rotate(15deg); }
+            55%  { height: 10px; transform: translateX(-50%) rotate(-8deg); }
+            75%  { height: 6px; transform: translateX(-50%) rotate(5deg); }
+            100% { height: 0; transform: translateX(-50%) rotate(0deg); }
+        }
+
+        /* Tail */
+        .cat-tail {
+            position: absolute;
+            bottom: 8px;
+            right: -8px;
+            width: 30px;
+            height: 8px;
+            background: #555;
+            border-radius: 4px 8px 8px 4px;
+            transform-origin: left center;
+            animation: tailIdle 2s ease-in-out infinite alternate;
+        }
+
+        .cat.excited .cat-tail {
+            animation: tailWag 0.25s ease-in-out infinite alternate;
+        }
+
+        @keyframes tailIdle {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(10deg); }
+        }
+
+        @keyframes tailWag {
+            0% { transform: rotate(-15deg); }
+            100% { transform: rotate(20deg); }
+        }
+
+        /* Whiskers */
+        .cat-whiskers {
+            position: absolute;
+            top: 24px;
+            width: 100%;
+        }
+
+        .cat-whisker {
+            position: absolute;
+            width: 16px;
+            height: 1px;
+            background: #888;
+        }
+
+        .cat-whisker.l1 { left: -12px; top: 0; transform: rotate(-10deg); }
+        .cat-whisker.l2 { left: -14px; top: 5px; transform: rotate(5deg); }
+        .cat-whisker.r1 { right: -12px; top: 0; transform: rotate(10deg); }
+        .cat-whisker.r2 { right: -14px; top: 5px; transform: rotate(-5deg); }
     </style>
 </head>
 <body>
@@ -358,6 +576,27 @@
             <div class="particles" id="particles"></div>
             <div class="sausage-container" id="sausageContainer">
                 <div class="sausage-whole" id="sausageWhole"></div>
+            </div>
+            <div class="cat" id="cat">
+                <div class="cat-head">
+                    <div class="cat-ear left"><div class="cat-ear-inner"></div></div>
+                    <div class="cat-ear right"><div class="cat-ear-inner"></div></div>
+                    <div class="cat-eyes">
+                        <div class="cat-eye"></div>
+                        <div class="cat-eye"></div>
+                    </div>
+                    <div class="cat-whiskers">
+                        <div class="cat-whisker l1"></div>
+                        <div class="cat-whisker l2"></div>
+                        <div class="cat-whisker r1"></div>
+                        <div class="cat-whisker r2"></div>
+                    </div>
+                    <div class="cat-nose"></div>
+                    <div class="cat-mouth"></div>
+                    <div class="cat-tongue"></div>
+                </div>
+                <div class="cat-body"></div>
+                <div class="cat-tail"></div>
             </div>
         </div>
 
@@ -382,6 +621,7 @@
         const sausageWhole = document.getElementById('sausageWhole');
         const particlesEl = document.getElementById('particles');
         const resetHint = document.getElementById('resetHint');
+        const cat = document.getElementById('cat');
 
         let isSliced = false;
         let isAnimating = false;
@@ -408,6 +648,7 @@
             isAnimating = true;
             btnSlice.classList.add('slicing');
             btnSlice.textContent = 'Нарезаю...';
+            cat.classList.add('excited', 'licking');
 
             const totalWidth = 360;
             const sliceWidth = Math.max(totalWidth / count, 12);
@@ -450,6 +691,7 @@
                         btnSlice.classList.remove('slicing');
                         btnSlice.textContent = 'Собрать';
                         resetHint.classList.add('visible');
+                        cat.classList.remove('licking');
                     }, 200);
                     return;
                 }
@@ -498,6 +740,7 @@
             isAnimating = true;
             sausageContainer.classList.remove('sliced');
             resetHint.classList.remove('visible');
+            cat.classList.remove('excited', 'licking');
 
             setTimeout(() => {
                 sausageContainer.innerHTML = '';
