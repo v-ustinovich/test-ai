@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нарезка колбасы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fef9e7 0%, #fdebd0 50%, #f6ddcc 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+
+        .app {
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #6b2d2d;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #a0664d;
+            font-size: 0.95rem;
+            margin-bottom: 36px;
+        }
+
+        .sausage-area {
+            position: relative;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 36px;
+        }
+
+        .sausage-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0px;
+            transition: gap 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .sausage-container.sliced {
+            gap: 8px;
+        }
+
+        .sausage-whole {
+            width: 360px;
+            height: 72px;
+            background: linear-gradient(180deg, #d4785c 0%, #b8533a 40%, #943d2a 100%);
+            border-radius: 36px;
+            position: relative;
+            box-shadow:
+                0 8px 24px rgba(148, 61, 42, 0.3),
+                inset 0 -4px 8px rgba(0,0,0,0.15),
+                inset 0 4px 8px rgba(255,200,160,0.25);
+            overflow: hidden;
+        }
+
+        .sausage-whole::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 20px;
+            right: 20px;
+            height: 12px;
+            background: linear-gradient(90deg, transparent, rgba(255,220,190,0.3), transparent);
+            border-radius: 50%;
+        }
+
+        /* Spots on sausage */
+        .sausage-whole::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 60%;
+            background-image:
+                radial-gradient(circle 4px, rgba(255,220,180,0.35) 0%, transparent 100%),
+                radial-gradient(circle 3px, rgba(255,220,180,0.25) 0%, transparent 100%),
+                radial-gradient(circle 5px, rgba(255,220,180,0.3) 0%, transparent 100%),
+                radial-gradient(circle 3px, rgba(255,220,180,0.2) 0%, transparent 100%),
+                radial-gradient(circle 4px, rgba(255,220,180,0.3) 0%, transparent 100%);
+            background-position: 15% 30%, 35% 65%, 55% 40%, 72% 60%, 88% 35%;
+            background-repeat: no-repeat;
+        }
+
+        .slice {
+            height: 72px;
+            background: linear-gradient(180deg, #d4785c 0%, #b8533a 40%, #943d2a 100%);
+            position: relative;
+            box-shadow:
+                0 6px 16px rgba(148, 61, 42, 0.25),
+                inset 0 -3px 6px rgba(0,0,0,0.12),
+                inset 0 3px 6px rgba(255,200,160,0.2);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.3s ease;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .slice.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .slice::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 15%;
+            right: 15%;
+            height: 8px;
+            background: rgba(255,220,190,0.25);
+            border-radius: 50%;
+        }
+
+        /* Cross-section face on slices */
+        .slice-face {
+            position: absolute;
+            top: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #e8a08a 0%, #cc7a60 40%, #a85540 100%);
+        }
+
+        .slice-face.left {
+            left: 0;
+            border-right: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .slice-face.right {
+            right: 0;
+            border-left: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .slice:first-child {
+            border-radius: 36px 4px 4px 36px;
+        }
+
+        .slice:last-child {
+            border-radius: 4px 36px 36px 4px;
+        }
+
+        .slice:first-child:last-child {
+            border-radius: 36px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .slider-group {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 10px;
+        }
+
+        .slider-label span {
+            color: #7a4a3a;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .slider-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #6b2d2d;
+            min-width: 48px;
+            text-align: right;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #e8c4a0, #d4956a);
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #fff, #f5e6d8);
+            border: 3px solid #b8533a;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(148, 61, 42, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 3px 12px rgba(148, 61, 42, 0.4);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #fff, #f5e6d8);
+            border: 3px solid #b8533a;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(148, 61, 42, 0.3);
+        }
+
+        .btn-slice {
+            padding: 14px 48px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #c0503a 0%, #943d2a 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            box-shadow:
+                0 4px 16px rgba(148, 61, 42, 0.35),
+                0 2px 4px rgba(148, 61, 42, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-slice:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 6px 24px rgba(148, 61, 42, 0.4),
+                0 3px 8px rgba(148, 61, 42, 0.25);
+        }
+
+        .btn-slice:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(148, 61, 42, 0.3);
+        }
+
+        .btn-slice.slicing {
+            pointer-events: none;
+            background: linear-gradient(135deg, #a04530 0%, #7a3020 100%);
+        }
+
+        .knife {
+            position: absolute;
+            top: -60px;
+            font-size: 48px;
+            opacity: 0;
+            transition: none;
+            pointer-events: none;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            z-index: 10;
+        }
+
+        .knife.animate {
+            animation: knifeSlice 0.3s ease-in-out;
+        }
+
+        @keyframes knifeSlice {
+            0% {
+                top: -60px;
+                opacity: 1;
+            }
+            50% {
+                top: 50%;
+                opacity: 1;
+            }
+            100% {
+                top: 120%;
+                opacity: 0;
+            }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #d4956a;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .particle.pop {
+            animation: particlePop 0.6s ease-out forwards;
+        }
+
+        @keyframes particlePop {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        .reset-hint {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #b8886e;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .reset-hint.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <h1>Нарезка колбасы</h1>
+        <p class="subtitle">Выберите количество кусочков и нарежьте!</p>
+
+        <div class="sausage-area">
+            <div class="particles" id="particles"></div>
+            <div class="sausage-container" id="sausageContainer">
+                <div class="sausage-whole" id="sausageWhole"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>Количество кусочков</span>
+                    <span class="slider-value" id="sliceCount">4</span>
+                </div>
+                <input type="range" id="slider" min="2" max="20" value="4">
+            </div>
+            <button class="btn-slice" id="btnSlice">Нарезать!</button>
+            <p class="reset-hint" id="resetHint">Нажмите ещё раз, чтобы собрать обратно</p>
+        </div>
+    </div>
+
+    <script>
+        const slider = document.getElementById('slider');
+        const sliceCount = document.getElementById('sliceCount');
+        const btnSlice = document.getElementById('btnSlice');
+        const sausageContainer = document.getElementById('sausageContainer');
+        const sausageWhole = document.getElementById('sausageWhole');
+        const particlesEl = document.getElementById('particles');
+        const resetHint = document.getElementById('resetHint');
+
+        let isSliced = false;
+        let isAnimating = false;
+
+        slider.addEventListener('input', () => {
+            sliceCount.textContent = slider.value;
+            if (isSliced) {
+                resetSausage();
+            }
+        });
+
+        btnSlice.addEventListener('click', () => {
+            if (isAnimating) return;
+
+            if (isSliced) {
+                resetSausage();
+                return;
+            }
+
+            sliceSausage(parseInt(slider.value));
+        });
+
+        function sliceSausage(count) {
+            isAnimating = true;
+            btnSlice.classList.add('slicing');
+            btnSlice.textContent = 'Нарезаю...';
+
+            const totalWidth = 360;
+            const sliceWidth = Math.max(totalWidth / count, 12);
+
+            sausageWhole.style.display = 'none';
+            sausageContainer.innerHTML = '';
+
+            // Create slices
+            const slices = [];
+            for (let i = 0; i < count; i++) {
+                const slice = document.createElement('div');
+                slice.className = 'slice';
+                slice.style.width = sliceWidth + 'px';
+
+                if (i > 0) {
+                    const faceLeft = document.createElement('div');
+                    faceLeft.className = 'slice-face left';
+                    slice.appendChild(faceLeft);
+                }
+                if (i < count - 1) {
+                    const faceRight = document.createElement('div');
+                    faceRight.className = 'slice-face right';
+                    slice.appendChild(faceRight);
+                }
+
+                sausageContainer.appendChild(slice);
+                slices.push(slice);
+            }
+
+            // Animate slices appearing one by one with knife
+            let i = 0;
+            const sliceInterval = Math.max(120, 400 / Math.sqrt(count));
+
+            function animateNext() {
+                if (i >= count) {
+                    setTimeout(() => {
+                        sausageContainer.classList.add('sliced');
+                        isSliced = true;
+                        isAnimating = false;
+                        btnSlice.classList.remove('slicing');
+                        btnSlice.textContent = 'Собрать';
+                        resetHint.classList.add('visible');
+                    }, 200);
+                    return;
+                }
+
+                slices[i].classList.add('visible');
+
+                // Spawn particles between slices
+                if (i > 0) {
+                    spawnParticles(slices[i].offsetLeft, sausageContainer.offsetTop);
+                }
+
+                i++;
+                setTimeout(animateNext, sliceInterval);
+            }
+
+            requestAnimationFrame(() => {
+                setTimeout(animateNext, 100);
+            });
+        }
+
+        function spawnParticles(x, y) {
+            const area = document.querySelector('.sausage-area');
+            const rect = area.getBoundingClientRect();
+
+            for (let j = 0; j < 5; j++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const tx = (Math.random() - 0.5) * 60;
+                const ty = (Math.random() - 0.5) * 60;
+                p.style.cssText = `
+                    left: ${50 + (Math.random() - 0.5) * 20}%;
+                    top: ${40 + (Math.random() - 0.5) * 30}%;
+                    --tx: ${tx}px;
+                    --ty: ${ty}px;
+                    background: hsl(${20 + Math.random() * 15}, ${60 + Math.random() * 20}%, ${60 + Math.random() * 20}%);
+                    width: ${4 + Math.random() * 4}px;
+                    height: ${4 + Math.random() * 4}px;
+                `;
+                particlesEl.appendChild(p);
+                requestAnimationFrame(() => p.classList.add('pop'));
+                setTimeout(() => p.remove(), 600);
+            }
+        }
+
+        function resetSausage() {
+            isAnimating = true;
+            sausageContainer.classList.remove('sliced');
+            resetHint.classList.remove('visible');
+
+            setTimeout(() => {
+                sausageContainer.innerHTML = '';
+                const whole = document.createElement('div');
+                whole.className = 'sausage-whole';
+                whole.id = 'sausageWhole';
+                whole.style.opacity = '0';
+                whole.style.transform = 'scale(0.9)';
+                whole.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                sausageContainer.appendChild(whole);
+
+                requestAnimationFrame(() => {
+                    whole.style.opacity = '1';
+                    whole.style.transform = 'scale(1)';
+                });
+
+                isSliced = false;
+                isAnimating = false;
+                btnSlice.textContent = 'Нарезать!';
+            }, 300);
+        }
+    </script>
+</body>
+</html>
